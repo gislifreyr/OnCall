@@ -1,0 +1,28 @@
+OnCall - bakvaktakerfi / emergency standby system
+
+OnCall is designed to track/plan who should be on-call for emergencies during
+which time periods, in advance. In praxis we designed it to be deployed so
+that a small script/daemon could run and periodically query the shifts table
+to update call-forwarding and/or nagios configurations.
+
+Authors:
+Steinn E. Sigurðarson <ses@hi.is>
+Guðjón Þorsteinsson <gth73@hi.is>
+Gísli Freyr Brynjarsson <gfb3@hi.is>
+
+
+This software is made available under the terms of GPLv3 (General Public
+License version 3). For details see the included LICENSE.txt. The included
+fullCalendar component is distributed along under it's own license, GPLv2,
+as can be seen in js/fullcalendar/GPL-LICENSE.txt. If you do not accept
+either license, then please move along. Nothing to see here.
+
+To setup, create a new database (preferably mysql, unless you're up to
+modifying the inc/db.inc.php connection statement, which unfortunately
+hardcodes mysql:) named "oncall", create the tables listed in `tables.sql`
+and grant all on oncall.* to oncall identified by 'usbkubbur1';
+
+Add some users into the staff table, the password field is expected to
+contain an md5 hash.
+
+Enjoy!

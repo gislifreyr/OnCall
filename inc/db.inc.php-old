@@ -1,0 +1,106 @@
+<?php
+// simple little db class. (Já þetta notar ekki PDO, og ekki prepared statements enda eru þau aðallega fyrir performance, ekki öryggi, input eiga að vera þokkalega vel cleaned annaðhvort með addslashes, eða casting.)
+
+class db
+{
+	var $l;
+	var $q;
+	var $db;
+	var $lastq;
+
+	function db($h, $u, $p, $dbname)
+	{
+		$this->l = mysql_connect($h,$u,$p);
+		$ret = mysql_select_db($dbname, $this->l);
+		if (!$ret)
+			throw new Exception("SQL Error: unable to select database: ". $dbname);
+		$this->db = $dbname;
+	}
+
+	function query($q)
+	{
+		$this->lastq = $q;
+		$this->q = mysql_query($q,$this->l);
+		if ($this->q === false)
+			throw new Exception("SQL Error (" .($this->db) . "): " . mysql_error() . " Statement: " . $q);
+		return $this->q;
+	}
+
+	function farr($q=null)
+	{
+		if (!$q)
+			$q = $this->q;
+
+		return mysql_fetch_array($q, MYSQL_ASSOC);
+	}
+
+	function frow($q=null)
+	{
+		if (!$q)
+			$q = $this->q;
+
+		return mysql_fetch_array($q, MYSQL_NUM);
+
+	}
+
+	function selectrow($q)
+	{
+		return $this->frow($this->query($q));
+	}
+
+	function selectarr($q)
+	{
+		return $this->farr($this->query($q));
+	}
+
+	function selectall_array($q)
+	{
+		$qi = $this->query($q);
+		$arr = array();
+		while ($a = $this->farr())
+			$arr[] = $a;
+
+		return $arr;
+	}
+
+	function selectall_array_by_key($q, $k)
+	{
+		$qi = $this->query($q);
+		$arr = array();
+		while ($a = $this->farr())
+		{
+			$arr[$a[$k]] = $a;
+		}
+
+		return $arr;
+
+	}
+
+	function selectall_row($q)
+	{
+		$qi = $this->query($q);
+		$arr = array();
+		while ($a = $this->frow())
+			$arr[] = $a;
+		return $arr;
+	}
+
+	function selectcol($q)
+	{
+		$r = $this->frow($this->query($q));
+		return $r[0];
+	}
+
+	function nrows()
+	{
+		$q = $this->q;
+		if (preg_match("/^SELECT/i", $this->lastq))
+			return mysql_num_rows($q);
+		else
+		{
+			return mysql_affected_rows($this->l);
+		}
+	}
+
+}
+?>
